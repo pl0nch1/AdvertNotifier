@@ -12,8 +12,8 @@ from utils import LOGGER
 from yaml import dump, load, Dumper, Loader
 
 OS_DRIVER_MAP = {  # constant file path of Chrome driver
-    'Linux': './app/linux/chromedriver',
-    'Windows': './app/windows/chromedriver.exe',
+    'Linux': './app/drivers/linux/chromedriver',
+    'Windows': './app/drivers//windows/chromedriver.exe',
 }
 
 PATH = Service(OS_DRIVER_MAP.get(platform.system()))
