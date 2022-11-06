@@ -3,15 +3,12 @@ import platform
 import random
 
 from selenium import webdriver
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import *
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.remote.webdriver import WebDriver, WebElement
-from teelgram_staff import get_client, send_adverts, start_telegram, Advert
-from utils import write_text, LOGGER
+from selenium.webdriver.remote.webdriver import WebDriver
+from app.telegram.teelgram_staff import get_client, send_adverts, start_telegram, Advert
+from utils import LOGGER
 from yaml import dump, load, Dumper, Loader
 
 OS_DRIVER_MAP = {  # constant file path of Chrome driver
