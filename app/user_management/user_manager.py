@@ -26,7 +26,7 @@ class UserManager:
         if not self.subscription_manager[tg_id]:
             raise UserUnsubscribed(f'{tg_id} not subscribed')
         if not self.requests_manager[tg_id]:
-            self.requests_manager.populate_request(tg_id)
+            self.requests_manager.init_requests(tg_id)
         if len(self.requests_manager[tg_id]) < self.subscription_manager[tg_id].quota:
             self.requests_manager[tg_id].append(request)
         else:
