@@ -22,6 +22,9 @@ class UserManager:
         self.subscription_manager.load()
         self.requests_manager.load()
 
+    def request_items(self):
+        return self.requests_manager.items()
+
     def append_request(self, tg_id, request):
         if not self.subscription_manager[tg_id]:
             raise UserUnsubscribed(f'{tg_id} not subscribed')

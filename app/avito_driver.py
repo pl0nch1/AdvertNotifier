@@ -13,16 +13,16 @@ from yaml import dump, load, Dumper, Loader
 
 OS_DRIVER_MAP = {  # constant file path of Chrome driver
     'Linux': './app/drivers/linux/chromedriver',
-    'Windows': './app/drivers//windows/chromedriver.exe',
+    'Windows': './app/drivers/windows/chromedriver.exe',
 }
 
 
 class AvitoDriver:
-    def __init__(self, request: str):
+    def __init__(self, request: str, headless: bool = True):
         self.request = request
-        self.init_driver()
+        self.init_driver(headless)
 
-    def init_driver(self):
+    def init_driver(self, headless: bool):
         path = Service(OS_DRIVER_MAP.get(platform.system()))
         options = webdriver.ChromeOptions()  # Initializing Chrome Options from the Webdriver
         options.add_experimental_option("useAutomationExtension",
@@ -33,7 +33,8 @@ class AvitoDriver:
         options.add_argument("disable-notifications")
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
-        options.add_argument("--headless")
+        if headless:
+            options.add_argument("--headless")
         if platform.system() == 'Linux':
             options.add_argument("--disable-dev-shm-usage")
         self.driver: WebDriver = webdriver.Chrome(options=options, service=path)
@@ -61,6 +62,3 @@ class AvitoDriver:
         except NoSuchElementException:
             LOGGER.error('No such element')
             return []
-
-    def close(self):
-        self.driver.close()
