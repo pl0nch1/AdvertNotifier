@@ -67,6 +67,9 @@ class RequestsManager(BaseModel, extra=Extra.allow):
     def load(self):
         self._requests = RequestsCollection.parse_obj(read_collection(self.path, self.filename))
 
+    def items(self):
+        return self._requests.collection.items()
+
     def dump(self):
         dump_collection(self.path, self.filename, self._requests.dict())
 
