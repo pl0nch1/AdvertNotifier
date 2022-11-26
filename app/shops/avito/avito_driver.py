@@ -1,28 +1,27 @@
-import asyncio
 import platform
-import random
+from typing import List
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import *
 from selenium.webdriver.remote.webdriver import WebDriver
-from app.telegram.teelgram_staff import get_client, send_adverts, start_telegram, Advert
-from utils import LOGGER
-from yaml import dump, load, Dumper, Loader
+
+from app.shops.avito.advert import AvitoAdvert
+from app.shops.base.driver import Driver
 
 OS_DRIVER_MAP = {  # constant file path of Chrome driver
-    'Linux': './app/drivers/linux/chromedriver',
-    'Windows': './app/drivers/windows/chromedriver.exe',
+    'Linux': './app/drivers_bin/linux/chromedriver',
+    'Windows': './app/drivers_bin/windows/chromedriver.exe',
 }
 
 
-class AvitoDriver:
+class AvitoDriver(Driver):
     def __init__(self, request: str, headless: bool = True):
-        self.request = request
-        self.init_driver(headless)
+        super(AvitoDriver, self).__init__(request, headless)
+        self._init_driver(headless)
 
-    def init_driver(self, headless: bool):
+    def _init_driver(self, headless: bool):
         path = Service(OS_DRIVER_MAP.get(platform.system()))
         options = webdriver.ChromeOptions()  # Initializing Chrome Options from the Webdriver
         options.add_experimental_option("useAutomationExtension",
@@ -42,23 +41,23 @@ class AvitoDriver:
         self.driver.get(
             self.request)
 
-    def set_request(self, request: str):
+    def set_request(self, request: str) -> None:
         self.request = request
         self.driver.get(self.request)
 
-    def get_adverts(self):
+    def get_adverts(self) -> List[AvitoAdvert]:
         self.driver.refresh()
         try:
             items = self.driver.find_elements(By.XPATH,
                                               "//h3[contains(@itemprop, 'name') and not(contains(@class, 'title-large'))]")
-            adverts = [Advert(item.text,
-                              item.find_element(By.XPATH, "./..").get_attribute('href'),
-                              item.find_element(By.XPATH, "./../../..").find_element(By.XPATH,
+            adverts = [AvitoAdvert(item.text,
+                                   item.find_element(By.XPATH, "./..").get_attribute('href'),
+                                   item.find_element(By.XPATH, "./../../..").find_element(By.XPATH,
                                                                                      ".//div[contains(@class, 'date-text')]").text,
-                              item.find_element(By.XPATH, "./../../..").find_element(By.XPATH,
+                                   item.find_element(By.XPATH, "./../../..").find_element(By.XPATH,
                                                                                      ".//div[contains(@class, 'price')]").text)
                        for item in items]
             return adverts
         except NoSuchElementException:
-            LOGGER.error('No such element')
+            self.logger.error('No such element')
             return []

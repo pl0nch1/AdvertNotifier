@@ -1,18 +1,29 @@
+import asyncio
+import os
 from typing import List
 
 from app.errors import OutOfRequestQuota, UserUnsubscribed
 from .sub_managers import SubscriptionManager, RequestsManager
 
 
+def loaded(func):
+    def wrapper(*args, **kwargs):
+        if not args[0].loaded.is_set():
+            raise RuntimeError('Manager must be loaded before being used')
+        func(*args, **kwargs)
+    return wrapper
+
+
 class UserManager:
     DATA_ENVVAR = 'DATA_PATH'
 
-    def __init__(self, path: str):
-        self.path = path
+    def __init__(self):
+        self.path = os.getenv(UserManager.DATA_ENVVAR)
         self.subscription_manager = SubscriptionManager(path=self.path, filename='subscriptions.yaml')
         self.requests_manager = RequestsManager(path=self.path, filename='requests.yaml')
+        self.loaded = asyncio.Event()
         if not self.path:
-            raise RuntimeError(f'{self.DATA_ENVVAR} envvar not defined')
+            raise RuntimeError(f'{UserManager.DATA_ENVVAR} envvar not defined')
 
     def dump(self):
         self.subscription_manager.dump()
@@ -21,6 +32,7 @@ class UserManager:
     def load(self):
         self.subscription_manager.load()
         self.requests_manager.load()
+        self.loaded.set()
 
     def request_items(self):
         return self.requests_manager.items()
