@@ -1,8 +1,9 @@
 import asyncio
 import platform
+from asyncio import Condition, Event
 from typing import List
 
-from arsenic import browsers, services, start_session
+from arsenic import browsers, services, start_session, get_session
 from arsenic.constants import SelectorType
 
 from app.shops.avito.advert import AvitoAdvert
@@ -17,7 +18,8 @@ OS_DRIVER_MAP = {  # constant file path of Chrome driver
 class AvitoDriverAsync(Driver):
     def __init__(self, request: str, headless: bool = True):
         super(AvitoDriverAsync, self).__init__(request, headless)
-        asyncio.run(self._init_driver(headless))
+        self.initialized = Event()
+        asyncio.ensure_future(self._init_driver(headless))
 
     async def _init_driver(self, headless: bool):
         path = OS_DRIVER_MAP.get(platform.system())
@@ -25,7 +27,9 @@ class AvitoDriverAsync(Driver):
         browser = browsers.Chrome(**{"goog:chromeOptions":{
             'args': ['--disable-gpu', '--no-sandbox', '--disable-dev-shm-usage']
         }})
+
         self.driver = await start_session(service, browser)
+        self.initialized.set()
 
     async def set_request(self, request: str) -> None:
         self.request = request
@@ -33,6 +37,7 @@ class AvitoDriverAsync(Driver):
 
     async def get_adverts(self) -> List[AvitoAdvert]:
         print(f"request is !!!!!!!!!!{self.request}")
+        await self.initialized.wait()
         await self.driver.get(self.request)
         # await self.driver.refresh() TODO: refresh doesn't work
         try:

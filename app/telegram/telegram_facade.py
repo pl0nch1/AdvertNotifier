@@ -16,9 +16,7 @@ class TelegramFacade:
 
     @classmethod
     def with_default_client(cls):
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        return cls(TelegramClient('session_name', api_id, api_hash, loop=loop))
+        return cls(TelegramClient('session_name', api_id, api_hash))
 
     def start_telegram(self):
         print('Starting telegram')
