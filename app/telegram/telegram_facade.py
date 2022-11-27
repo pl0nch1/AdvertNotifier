@@ -1,3 +1,4 @@
+import asyncio
 from typing import List
 
 from telethon import TelegramClient
@@ -15,9 +16,12 @@ class TelegramFacade:
 
     @classmethod
     def with_default_client(cls):
-        return cls(TelegramClient('session_name', api_id, api_hash))
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return cls(TelegramClient('session_name', api_id, api_hash, loop=loop))
 
     def start_telegram(self):
+        print('Starting telegram')
         start_telegram(self.client)
 
     async def send_adverts(self, destination: str, adverts: List[Advert]):
