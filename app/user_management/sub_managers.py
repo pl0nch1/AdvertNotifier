@@ -6,6 +6,7 @@ from typing import Dict, List
 from pydantic import BaseModel, Field, Extra
 from yaml import dump, load, Dumper, Loader
 
+from app.errors import UserHasNoRequests
 from app.models.user_info import SubscriptionCollection, RequestsCollection, Subscription
 
 
@@ -88,4 +89,6 @@ class RequestsManager(BaseModel, extra=Extra.allow):
         del self[tg_id][index]
 
     def list_requests(self, tg_id: str) -> List[str]:
+        if not self[tg_id]:
+            raise UserHasNoRequests('User has no requests')
         return self[tg_id]

@@ -4,6 +4,7 @@ import logging
 from app.shops.avito.avito_driver_manager import AvitoDriverManager
 from app.telegram.telegram_facade import TelegramFacade
 from app.user_management.user_manager import UserManager
+from app.context import user_manager
 
 logger = logging.getLogger('scheduler')
 logger.setLevel(logging.INFO)
@@ -11,10 +12,9 @@ logger.setLevel(logging.INFO)
 
 class Scheduler:
     def __init__(self):
-        self.user_manager = UserManager()
-        self.user_manager.load()
-        self.user_manager.subscribe('tech9998', 10)
-        self.user_manager.append_request('tech9998', 'https://www.avito.ru/sankt_peterburg_i_lo?q=rtx_2060')
+        self.user_manager = user_manager
+        # self.user_manager.subscribe('tech9998', 10)
+        # self.user_manager.append_request('tech9998', 'https://www.avito.ru/sankt_peterburg_i_lo?q=rtx_2060')
         # self.user_manager.append_request('tech9998', 'https://www.avito.ru/sankt_peterburg_i_lo?q=fatshark')
         # self.user_manager.append_request('tech9998', 'https://www.avito.ru/sankt_peterburg_i_lo?q=skyzone')
         # self.user_manager.append_request('tech9998', 'https://www.avito.ru/sankt_peterburg_i_lo?q=dji_fpv')

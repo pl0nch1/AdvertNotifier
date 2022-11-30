@@ -24,7 +24,7 @@ class AvitoDriverAsync(Driver):
     async def _init_driver(self, headless: bool):
         path = OS_DRIVER_MAP.get(platform.system())
         service = services.Chromedriver(binary=path)
-        browser = browsers.Chrome(**{"goog:chromeOptions":{
+        browser = browsers.Chrome(**{"goog:chromeOptions": {
             'args': ['--disable-gpu', '--no-sandbox', '--disable-dev-shm-usage']
         }})
 
@@ -49,10 +49,10 @@ class AvitoDriverAsync(Driver):
             for item in items:
                 text_coroutine = item.get_text()
                 url_coroutine = item.get_element("//./..", selector_type=SelectorType.xpath)
-                date_coroutine = item.get_element("//./../../..//div[contains(@class, 'date-text')]",
-                                                   selector_type=SelectorType.xpath)
+                date_coroutine = item.get_element("//./../../..//div[contains(@class, 'date-text')]",  # TODO find error
+                                                  selector_type=SelectorType.xpath)
                 price_coroutine = item.get_element("//./../../..//div[contains(@class, 'price')]",
-                                                    selector_type=SelectorType.xpath)
+                                                   selector_type=SelectorType.xpath)
 
                 [title, url, time_ago, cost] = await asyncio.gather(text_coroutine, url_coroutine, date_coroutine,
                                                                     price_coroutine)
