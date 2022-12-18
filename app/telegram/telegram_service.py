@@ -18,15 +18,15 @@ async def handle_subscribe(client: TelegramClient, event, arg):
     async with client.conversation(await event.get_sender()) as conv:
         if not arg:
             buttons = client.build_reply_markup([
-                Button.inline('Подписаться на месяц 1 месяц', 1),
-                Button.inline('Подписаться на 3 месяца', 3)
+                Button.inline('+1 запрос к квоте', 1),
+                Button.inline('+3 запроса к квоте', 3)
             ])
             message = await client.send_message(sender, 'Оформить подписку можно в любое время с помощью онлайн кассы',
                                                 buttons=buttons)
-            arg = str((await conv.wait_event(events.CallbackQuery(sender.username))).data)
+            arg = int((await conv.wait_event(events.CallbackQuery(sender.username))).data)
             await client.delete_messages(sender, [message.id])
-        await client.send_message(sender, f'Оформляем подписку на {arg} месяцев(-а)...')
-
+        await client.send_message(sender, f'Оформляем подписку на {arg} запроса(-ов)...')
+        user_manager.subscribe(sender.username, arg)
 
 async def show_help(client, user_id):
     text = '\n'.join(handlers.keys())
@@ -52,22 +52,6 @@ def start_telegram(client: TelegramClient):
                 await show_help(client, (await event.get_sender()).id)
             else:
                 await handler(client, event, arg)
-
-        @client.on(events.NewMessage(pattern='/test'))
-        async def test(event):
-            buttons = client.build_reply_markup([
-                Button.text('Оформить подпсику'),
-                Button.text('Добавить мониторинг')
-            ])
-            await client.send_message((await event.get_sender()).username, 'hi', buttons=buttons)
-
-        @client.on(events.NewMessage(pattern='/test1'))
-        async def test(event):
-                await conv.send_message('hi')
-                answer = await conv.get_response()
-                print(answer)
-                await conv.send_message(f'Hi {answer}')
-
         client.run_until_disconnected()
 
 

@@ -36,31 +36,33 @@ class AvitoDriverAsync(Driver):
         await self.driver.get(self.request)
 
     async def get_adverts(self) -> List[AvitoAdvert]:
-        print(f"request is !!!!!!!!!!{self.request}")
         await self.initialized.wait()
         await self.driver.get(self.request)
         # await self.driver.refresh() TODO: refresh doesn't work
         try:
-            items = await self.driver.get_elements(0,
-                                                   "//h3[contains(@itemprop, 'name') and not(contains(@class, 'title-large'))]",
+            print("123")
+            items = await self.driver.get_elements("//h3[contains(@itemprop, 'name') and not(contains(@class, 'title-large'))]",
                                                    selector_type=SelectorType.xpath)
-
+            print("147981895418947618947" + str(items))
             adverts = []
             for item in items:
                 text_coroutine = item.get_text()
-                url_coroutine = item.get_element("//./..", selector_type=SelectorType.xpath)
-                date_coroutine = item.get_element("//./../../..//div[contains(@class, 'date-text')]",  # TODO find error
+                url_coroutine = item.get_element("./../../a", selector_type=SelectorType.xpath)
+                date_coroutine = item.get_element("./../../..//div[contains(@data-marker, 'item-date')]",  # TODO find error
                                                   selector_type=SelectorType.xpath)
-                price_coroutine = item.get_element("//./../../..//div[contains(@class, 'price')]",
+                price_coroutine = item.get_element("./../../..//span[contains(@data-marker, 'item-price')]/span",
                                                    selector_type=SelectorType.xpath)
 
                 [title, url, time_ago, cost] = await asyncio.gather(text_coroutine, url_coroutine, date_coroutine,
                                                                     price_coroutine)
 
-                adverts.append(AvitoAdvert(title, url, time_ago, cost))
+                adverts.append(AvitoAdvert(title,
+                                           await url.get_property("href"),
+                                           await time_ago.get_text(),
+                                           await cost.get_text()))
 
-            return adverts
+            return list(reversed(adverts))
 
-        except Exception:
-            self.logger.error('No such element')
+        except Exception as e:
+            self.logger.error(f'No such element: {e}')
             return []

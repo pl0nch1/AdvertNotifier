@@ -34,7 +34,6 @@ class Scheduler:
                 fetch_result = await self.avito.execute_drivers()
                 try:
                     for tg_id, requests in self.user_manager.request_items():
-                        print(requests)
                         sent_result = await asyncio.gather(*[self.telegram.send_adverts(tg_id, fetch_result[request])
                                                              for request
                                                              in requests])
