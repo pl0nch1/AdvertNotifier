@@ -1,8 +1,6 @@
 from typing import List
 from telethon import TelegramClient
 
-# These example values won't work. You must get your own api_id and
-# api_hash from https://my.telegram.org, under API Development.\
 from app.shops.base.advert import Advert
 
 

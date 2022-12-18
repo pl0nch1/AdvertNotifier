@@ -1,9 +1,9 @@
 import asyncio
 import platform
-from asyncio import Condition, Event
+from asyncio import Event
 from typing import List
 
-from arsenic import browsers, services, start_session, get_session
+from arsenic import browsers, services, start_session
 from arsenic.constants import SelectorType
 
 from app.shops.avito.advert import AvitoAdvert
@@ -38,7 +38,6 @@ class AvitoDriverAsync(Driver):
     async def get_adverts(self) -> List[AvitoAdvert]:
         await self.initialized.wait()
         await self.driver.get(self.request)
-        # await self.driver.refresh() TODO: refresh doesn't work
         try:
             print("123")
             items = await self.driver.get_elements("//h3[contains(@itemprop, 'name') and not(contains(@class, 'title-large'))]",
@@ -64,5 +63,5 @@ class AvitoDriverAsync(Driver):
             return list(reversed(adverts))
 
         except Exception as e:
-            self.logger.error(f'No such element: {e}')
+            self.logger.error(f'Failed to parse adverts: {e}')
             return []
